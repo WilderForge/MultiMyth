@@ -1,0 +1,130 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'org.ow2.asm:asm:9.8'
+		classpath 'org.ow2.asm:asm-tree:9.8'
+	}
+}
+
+import org.objectweb.asm.*
+import org.objectweb.asm.tree.*
+
+
+def versionMap = [
+	'1.0' : 45, '1.1' : 45, '1.2' : 46, '1.3' : 47, '1.4' : 48, '1.5' : 49, '1.6' : 50,
+	'1.7' : 51, '1.8' : 52, '9'   : 53, '10'  : 54, '11'  : 55, '12'  : 56, '13'  : 57,
+	'14'  : 58, '15'  : 59, '16'  : 60, '17'  : 61, '18'  : 62, '19'  : 63, '20'  : 64,
+	'21'  : 65, '22'  : 66, '23'  : 67, '24'  : 68, '25'  : 69
+]
+
+def getProjectCompilationVersionConstant = { ->
+	def annotationClassFile = file("$buildDir/classes/java/java8/com/wildermods/multimyth/internal/CompileStrictly.class") //LITERAL REFERENCE
+	if (!annotationClassFile.exists()) {
+		throw new GradleException("Can't find CompileStrictly.class at ${annotationClassFile}")
+	}
+
+	def inputStream = annotationClassFile.newInputStream()
+	def cr = new ClassReader(inputStream)
+	def classNode = new ClassNode()
+	cr.accept(classNode, 0)
+	inputStream.close()
+
+	def field = classNode.fields.find { it.name == "PROJECT_COMPILATION_VERSION" } //LITERAL REFERENCE
+	if (!field || !field.value) {
+		throw new GradleException("PROJECT_COMPILATION_VERSION constant not found in CompileStrictly")
+	}
+
+	return field.value.toString()
+}
+
+task enforceJavaLevels {
+	group = 'verification'
+	description = 'Fails build if any @CompileStrictly classes were compiled with the wrong Java version.'
+
+	def classDirs = [
+		file("$buildDir/classes/java/main"),
+		file("$buildDir/classes/java/java8")
+	]
+
+	inputs.files classDirs.collect { it.exists() ? fileTree(it) : null }.findAll { it != null }
+	outputs.upToDateWhen { false }
+
+	doLast {
+		classDirs.each { classDir ->
+			if (!classDir.exists()) {
+				logger.lifecycle("Class directory does not exist: ${classDir}")
+				return
+			}
+	
+			logger.lifecycle("Scanning classes in: ${classDir}")
+	
+			classDir.eachFileRecurse { file ->
+				if (!file.name.endsWith('.class')) return
+	
+				logger.lifecycle("Checking class file: ${file}")
+	
+				def input = file.newInputStream()
+				def cr = new ClassReader(input)
+				def classNode = new ClassNode()
+				cr.accept(classNode, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG)
+	
+				def allAnnotations = (classNode.visibleAnnotations ?: []) + (classNode.invisibleAnnotations ?: [])
+	
+				def compileStrictlyDesc = 'Lcom/wildermods/multimyth/internal/CompileStrictly;' //LITERAL REFERENCE
+				def compileStrictlyAnnotation = allAnnotations.find {
+					it.desc == compileStrictlyDesc
+				}
+	
+				if (compileStrictlyAnnotation) {
+					logger.lifecycle("Found @CompileStrictly on ${classNode.name} in file ${file}")
+	
+					def versionStr = getProjectCompilationVersionConstant()
+					def values = compileStrictlyAnnotation.values
+					
+					if(values != null) {
+						compileStrictlyAnnotation.values.collate(2).each { pair ->
+							if (pair[0] == 'value') {
+								versionStr = pair[1].toString()
+							}
+						}
+					}
+	
+					logger.lifecycle("Annotation value: ${versionStr}")
+	
+					if (versionStr != null) {
+						def expected = versionMap[versionStr]
+						if (expected == null) {
+							throw new GradleException("Unknown Java version '$versionStr' in @CompileStrictly")
+						}
+	
+						int actual = cr.readUnsignedShort(6) // ASM recommended way
+	
+						logger.lifecycle("Class ${classNode.name} bytecode version: $actual (expected $expected)")
+	
+						if (actual != expected) {
+							throw new GradleException("Class ${classNode.name} compiled with bytecode $actual, expected $expected (Java $versionStr)")
+						}
+					}
+				}
+	
+				input.close()
+			}
+		}
+	}
+}
+
+def getNormalizedJavaVersion() {
+	if (project.hasProperty('java') && project.java.toolchain.languageVersion.isPresent()) {
+		def version = project.java.toolchain.languageVersion.get()
+		return version.asInt() >= 9 ? version.toString() : "1.${version}"
+	}
+	else {
+		throw new GradleException("Could not determine project's java version")
+	}
+}
+
+// Run this during `check`
+check.dependsOn enforceJavaLevels
+enforceJavaLevels.mustRunAfter(compileJava)

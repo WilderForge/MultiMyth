@@ -1,0 +1,72 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+apply from: 'verifyCompilation.gradle'
+
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+}
+
+def java8Home = javaToolchains
+    .launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+
+
+tasks.named("classes") {
+    dependsOn tasks.named("compileJava8")
+}
+
+sourceSets {
+    java8 {
+        java {
+            srcDirs = ['src/main/java8']
+        }
+        compileClasspath = files()
+    }
+
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+def compileJava8 = tasks.register('compileJava8', JavaCompile) {
+	doFirst {
+		logger.lifecycle("compileJava8 using compiler: ${javaCompiler.get().metadata.installationPath.asFile}")
+	}
+    source = sourceSets.java8.java
+    destinationDirectory = file("$buildDir/classes/java/java8")
+    classpath = files()
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    javaCompiler.set(javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    })
+}
+
+tasks.compileJava {
+    dependsOn compileJava8
+
+    // Exclude java8 source files from compileJava task source
+    source = sourceSets.main.java.filter { file ->
+        !sourceSets.java8.allJava.contains(file)
+    }
+
+    // Add java8 compiled output to classpath so main can reference java8 classes
+    classpath += files(compileJava8.get().destinationDirectory)
+}
+
+tasks.classes {
+    dependsOn compileJava8
+}
+
+tasks.named("jar") {
+    dependsOn compileJava8
+    from(compileJava8.map { it.destinationDirectory })
+}
