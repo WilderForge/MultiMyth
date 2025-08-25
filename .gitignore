@@ -1,5 +1,7 @@
 ## Fabric:
 *.log
+*.log.gz
+logs/*
 
 ## Gradle:
 .gradle/
