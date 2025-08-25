@@ -80,6 +80,9 @@ subprojects {
 	  api libs.asm.util
 	  api libs.asm.tree
 	  api libs.fabric.loader
+	  api libs.thrixlvault
+	  api libs.maven.fetcher
+	  api libs.workspace
   }
   
 }

@@ -1,9 +1,12 @@
 [versions]
 asm_version = "9.8"
-fabric_loader_version = "0.16.15+WilderForge"
+fabric_loader_version = "0.17.2+WilderForge.0.2.1"
 gson_version = "2.13.1"
 log4j_version = "2.24.3"
+maven_fetcher_version = "1.1.1+WilderForge.1.0.2"
 mixin_version = "0.15.5+mixin.0.8.7"
+thrixlvault_version = "0.6.1.0"
+workspace_version = "5.6.0.0"
 
 [libraries]
 asm = { module = "org.ow2.asm:asm", version.ref = "asm_version" }
@@ -16,4 +19,7 @@ fabric-loader = { module = "com.wildermods:fabric-loader", version.ref = "fabric
 gson = { module = "com.google.code.gson:gson", version.ref = "gson_version"}
 log4j = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j_version" }
 log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j_version" }
+maven_fetcher = { module = "org.myjtools:maven-fetcher", version.ref = "maven_fetcher_version" }
 mixin = { module = "net.fabricmc:sponge-mixin", version.ref = "mixin_version" }
+thrixlvault = { module = "com.wildermods:thrixlvault", version.ref = "thrixlvault_version" }
+workspace = { module = "com.wildermods.workspace:com.wildermods.workspace.gradle.plugin", version.ref = "workspace_version" }
