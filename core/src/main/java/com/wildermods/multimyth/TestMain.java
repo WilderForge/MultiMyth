@@ -14,6 +14,7 @@ import com.wildermods.thrixlvault.ChrysalisizedVault;
 import com.wildermods.thrixlvault.MassDownloadWeaver;
 import com.wildermods.thrixlvault.exception.MissingVersionException;
 import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
+import com.wildermods.workspace.dependency.ProjectDependencyType;
 import com.wildermods.workspace.dependency.WWProjectDependency;
 
 public class TestMain {
@@ -28,7 +29,7 @@ public class TestMain {
 	}
 	
 	public static void main(String[] args) throws IOException, InterruptedException, IntegrityException, ExecutionException {
-/*		
+	
 		WildermythManifest manifest = WildermythManifest.getLatest();
 		
 		ChrysalisizedVault c;
@@ -42,23 +43,26 @@ public class TestMain {
 		}
 
 		c.export(dir, true);
-		*/
+		
 		LinkedHashSet<MavenArtifactDefinition> fabricDeps = new LinkedHashSet<>();
 		LinkedHashSet<MavenArtifactDefinition> fabricImpls = new LinkedHashSet<>();
 		
+		dependencies:
 		for(WWProjectDependency dependency : WWProjectDependency.values()) {
-			switch(dependency.getType()) {
-				case fabricDep:
-					fabricDeps.add(new MavenArtifactDefinition(dependency));
-					break;
-				case fabricImpl:
-					fabricImpls.add(new MavenArtifactDefinition(dependency));
-					break;
-				case retrieveJson:
-					//NO-OP
-					break;
-				default:
-					throw new AssertionError("Only fabric dependencies should be here??");
+			for(ProjectDependencyType type : dependency.getTypes()) {
+					switch(type) {
+					case fabricDep:
+						fabricDeps.add(new MavenArtifactDefinition(dependency, type));
+						continue dependencies;
+					case fabricImpl:
+						fabricImpls.add(new MavenArtifactDefinition(dependency, type));
+						continue dependencies;
+					case retrieveJson:
+						//NO-OP
+						break;
+					default:
+						throw new AssertionError("Only fabric dependencies should be here??");
+				}
 			}
 		}
 		
@@ -74,7 +78,15 @@ public class TestMain {
 			}
 		});
 		MavenDownloader implDownloader = new MavenDownloader(fabricImpls, (download) -> {
-			Path dest = Path.of("./bin/test").resolve(download.name() + "-" + download.version() + ".jar");
+			Path dest = Path.of("./bin/test");
+			String fullName = download.name() + "-" + download.version() + ".jar";
+			if(download.name().equals("fabric-loader") || download.name().equals("provider")) {
+				dest = dest.resolve(fullName);
+			}
+			else {
+				dest = dest.resolve("fabric").resolve(fullName);
+			}
+			
 			try {
 				Files.createDirectories(dest.getParent());
 				Files.copy(download.dest(), dest);
