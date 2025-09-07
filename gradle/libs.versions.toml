@@ -5,8 +5,8 @@ gson_version = "2.13.1"
 log4j_version = "2.24.3"
 maven_fetcher_version = "1.1.1+WilderForge.1.0.2"
 mixin_version = "0.15.5+mixin.0.8.7"
-thrixlvault_version = "0.6.1.0"
-workspace_version = "5.6.0.0"
+thrixlvault_version = "0.7.0.0"
+workspace_version = "6.3.0.0"
 
 [libraries]
 asm = { module = "org.ow2.asm:asm", version.ref = "asm_version" }

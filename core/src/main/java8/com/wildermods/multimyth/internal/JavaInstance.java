@@ -24,15 +24,15 @@ public class JavaInstance implements JVM {
 	public final String version;
 	public final Path jvmLocation;
 	private final Path launchDir;
-	private Properties properties;
+	private transient Properties properties;
 	
-	private JavaInstance(String version, Path jvmLocation, Path launchDir) {
+	JavaInstance(String version, Path jvmLocation, Path launchDir) {
 		this.version = version;
 		this.jvmLocation = jvmLocation;
 		this.launchDir = launchDir;
 	}
 	
-	private JavaInstance() throws IOException {
+	JavaInstance() throws IOException {
 		this.version = JAVA_SPEC_VERSION;
 		this.jvmLocation = currentJVMBinaryPath();
 		this.properties = System.getProperties();

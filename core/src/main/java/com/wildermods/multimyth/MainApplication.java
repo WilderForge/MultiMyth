@@ -16,11 +16,24 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.google.gson.FormattingStyle;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.wildermods.multimyth.internal.CompileStrictly;
+import com.wildermods.multimyth.internal.Steam;
 import com.wildermods.multimyth.ui.MainWindow;
 
 @CompileStrictly
 public class MainApplication extends ApplicationAdapter {
+	
+	public static final Gson gson;
+	static {
+		GsonBuilder builder = new GsonBuilder();
+		builder.setFormattingStyle(FormattingStyle.PRETTY.withIndent("\t"));
+		gson = builder.create();
+	}
+	
+	private Steam steam;
     private Stage stage;
     private MainWindow mainWindow;
     private Skin skin;
@@ -95,6 +108,10 @@ public class MainApplication extends ApplicationAdapter {
     
     public MainWindow getMainWindow() {
     	return mainWindow;
+    }
+    
+    public Steam getSteam() {
+    	return steam;
     }
  
 }

@@ -19,7 +19,7 @@ import net.fabricmc.loader.impl.util.version.StringVersion;
 
 @CompileStrictly
 public class WildermythGameInstance implements GameDefinition {
-
+	
 	private final Path dir;
 	
 	public WildermythGameInstance(Path dir) {

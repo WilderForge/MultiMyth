@@ -2,6 +2,7 @@ package com.wildermods.multimyth.artifact.maven;
 
 import org.myjtools.mavenfetcher.FetchedArtifact;
 
+import com.wildermods.workspace.dependency.ProjectDependencyType;
 import com.wildermods.workspace.dependency.WWProjectDependency;
 
 public record MavenArtifactDefinition(String type, String group, String name, String version) implements IMavenArtifact {
@@ -10,8 +11,8 @@ public record MavenArtifactDefinition(String type, String group, String name, St
 		this(type, artifact.groupId(), artifact.artifactId(), artifact.version());
 	}
 	
-	public MavenArtifactDefinition(WWProjectDependency dependency) {
-		this(dependency.getType().toString(), dependency.getGroup(), dependency.getName(), dependency.getVersion());
+	public MavenArtifactDefinition(WWProjectDependency dependency, ProjectDependencyType type) {
+		this(type.toString(), dependency.getGroup(), dependency.getName(), dependency.getVersion());
 	}
 	
 	@Override
