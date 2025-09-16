@@ -42,50 +42,50 @@ public class MainWindow extends MultimythTable {
 	private Cell<MultimythTable> bottomPanelCell;
 	
 	public MainWindow(Skin skin) {
-	    super(skin);
-	    debug();
-	    setSkin(skin);
-	    
-	    topPanel = new MultimythTable(skin);
-	    sidePanel = new MultimythTable(skin);
-	    
-	    // Create the grid and wrap it in a Container for proper alignment
-	    grid = new Grid(128);
-	    Table gridContainer = new Table();
-	    gridContainer.add(grid).align(Align.topLeft).expandX().fillX();
-	    gridContainer.top().left(); // Force top-left alignment
-	    
-	    mainPanel = new ScrollPane(gridContainer);
-	    bottomPanel = new MultimythTable(skin);
-	    
-	    setFillParent(true);
-	    pad(16f);
-	    this.setBackground(skin.getDrawable("window"));
-	    
-	    topPanelCell = this.add(topPanel).colspan(2);
-	    topPanelCell.expandX().fill().row();
-	    addTopPanelStuff(topPanel);
+		super(skin);
+		debug();
+		setSkin(skin);
+		
+		topPanel = new MultimythTable(skin);
+		sidePanel = new MultimythTable(skin);
+		
+		// Create the grid and wrap it in a Container for proper alignment
+		grid = new Grid(128);
+		Table gridContainer = new Table();
+		gridContainer.add(grid).align(Align.topLeft).expandX().fillX();
+		gridContainer.top().left(); // Force top-left alignment
+		
+		mainPanel = new ScrollPane(gridContainer, skin);
+		bottomPanel = new MultimythTable(skin);
+		
+		setFillParent(true);
+		pad(16f);
+		this.setBackground(skin.getDrawable("window"));
+		
+		topPanelCell = this.add(topPanel).colspan(2);
+		topPanelCell.expandX().fill().row();
+		addTopPanelStuff(topPanel);
 
-	    topPanel.setBackground(createSolidColorDrawable(Color.RED));
-	    
-	    // Add the scroll pane directly
-	    this.add(mainPanel).expand().fillX().align(Align.topLeft);
-	    mainPanel.debugAll();
-	    mainPanel.setScrollingDisabled(true, false);
-	    mainPanel.setFadeScrollBars(false);
-	    mainPanel.setScrollbarsVisible(true);
-	    
-	   this.add(sidePanel).width(Value.percentWidth(0.1f, this)).fillY();
-	   sidePanel.background(createSolidColorDrawable(Color.BLUE));
-	    addMainPanelStuff(grid);
-	    
-	    this.row();
-	    
-	    this.add(bottomPanel).colspan(2).expandX().fill();
-	    bottomPanel.background(createSolidColorDrawable(Color.GREEN));
-	    addBottomPanelStuff(bottomPanel);
+		topPanel.setBackground(createSolidColorDrawable(Color.RED));
+		
+		// Add the scroll pane directly
+		this.add(mainPanel).expand().fillX().align(Align.topLeft);
+		mainPanel.debugAll();
+		mainPanel.setScrollingDisabled(true, false);
+		mainPanel.setFadeScrollBars(false);
+		mainPanel.setScrollbarsVisible(true);
+		
+		this.add(sidePanel).width(256).fillY();
+		sidePanel.background(createSolidColorDrawable(Color.BLUE));
+		addMainPanelStuff(grid);
+		
+		this.row();
+		
+		this.add(bottomPanel).colspan(2).expandX().fill();
+		bottomPanel.background(createSolidColorDrawable(Color.GREEN));
+		addBottomPanelStuff(bottomPanel);
 
-	    System.out.println("test");
+		System.out.println("test");
 	}
 	
 	private void addMainPanelStuff(Grid actor) {
@@ -120,7 +120,7 @@ public class MainWindow extends MultimythTable {
 	
 	@Override
 	public void act(float delta) {
-	    super.act(delta);
+		super.act(delta);
 	}
 	
 	private void addTopPanelStuff(MultimythTable topPanel) {
@@ -148,12 +148,12 @@ public class MainWindow extends MultimythTable {
 	}
 	
 	private static Drawable createSolidColorDrawable(Color color) {
-	    Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-	    pixmap.setColor(color);
-	    pixmap.fill();
-	    Texture texture = new Texture(pixmap);
-	    pixmap.dispose();
-	    return new TextureRegionDrawable(new TextureRegion(texture));
+		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		pixmap.setColor(color);
+		pixmap.fill();
+		Texture texture = new Texture(pixmap);
+		pixmap.dispose();
+		return new TextureRegionDrawable(new TextureRegion(texture));
 	}
 
 }
