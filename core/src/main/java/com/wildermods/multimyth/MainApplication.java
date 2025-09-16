@@ -26,6 +26,8 @@ import com.wildermods.multimyth.ui.MainWindow;
 @CompileStrictly
 public class MainApplication extends ApplicationAdapter {
 	
+	public static final String VERSION = "@MULTIMYTH_VERSION@";
+	
 	public static final Gson gson;
 	static {
 		GsonBuilder builder = new GsonBuilder();
@@ -49,7 +51,7 @@ public class MainApplication extends ApplicationAdapter {
     		throw new IllegalStateException();
     	}
     	
-    	try (ServerSocket server = new ServerSocket(61218)) {
+/*    	try (ServerSocket server = new ServerSocket(61218)) {
 			Socket socket = server.accept();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			while(reader.readLine() != null) {
@@ -57,7 +59,7 @@ public class MainApplication extends ApplicationAdapter {
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		}
+		}*/
     	
 
     	

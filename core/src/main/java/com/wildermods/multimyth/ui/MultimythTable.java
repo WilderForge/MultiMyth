@@ -9,7 +9,7 @@ public class MultimythTable extends Table {
 	
 	public MultimythTable(Skin skin) {
 		super(skin);
-		
 	}
 	
+	public void build() {};
 }
