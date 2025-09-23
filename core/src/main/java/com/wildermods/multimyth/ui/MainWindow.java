@@ -43,7 +43,7 @@ public class MainWindow extends MultimythTable {
 	
 	public MainWindow(Skin skin) {
 		super(skin);
-		debug();
+		//debug();
 		setSkin(skin);
 		
 		topPanel = new MultimythTable(skin);
@@ -55,7 +55,7 @@ public class MainWindow extends MultimythTable {
 		gridContainer.add(grid).align(Align.topLeft).expandX().fillX();
 		gridContainer.top().left(); // Force top-left alignment
 		
-		mainPanel = new ScrollPane(gridContainer, skin);
+		mainPanel = new AutoFocusingScrollPane(gridContainer, skin);
 		bottomPanel = new MultimythTable(skin);
 		
 		setFillParent(true);
@@ -70,7 +70,7 @@ public class MainWindow extends MultimythTable {
 		
 		// Add the scroll pane directly
 		this.add(mainPanel).expand().fillX().align(Align.topLeft);
-		mainPanel.debugAll();
+		//mainPanel.debugAll();
 		mainPanel.setScrollingDisabled(true, false);
 		mainPanel.setFadeScrollBars(false);
 		mainPanel.setScrollbarsVisible(true);
@@ -84,8 +84,6 @@ public class MainWindow extends MultimythTable {
 		this.add(bottomPanel).colspan(2).expandX().fill();
 		bottomPanel.background(createSolidColorDrawable(Color.GREEN));
 		addBottomPanelStuff(bottomPanel);
-
-		System.out.println("test");
 	}
 	
 	private void addMainPanelStuff(Grid actor) {
