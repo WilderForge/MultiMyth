@@ -1,0 +1,56 @@
+topPanel.newInstance=新しいインスタンス
+topPanel.folders=フォルダ
+topPanel.settings=設定
+topPanel.update=更新
+topPanel.help=ヘルプ
+topPanel.steam.notLoggedIn=Steamにログインしていません。
+topPanel.steam.loggedIn=ようこそ、{0}さん
+
+sidePanel.launch=起動
+sidePanel.edit=インスタンスを編集
+sidePanel.view.mods=MODを表示
+sidePanel.screenshots=スクリーンショット管理
+sidePanel.saves=セーブ管理
+sidePanel.installFolder=インストールフォルダ
+sidePanel.configFolder=設定フォルダ
+sidePanel.modFolder=MODフォルダ
+sidePanel.shortcut=ショートカット作成
+sidePanel.delete=削除
+sidePanel.clone=インスタンスを複製
+
+error.ass=このマシンはクソです。セッションを終了します。{0}
+error.unexpected=予期しないエラーが発生しました: {0}
+error.steam.signedout=Steamからサインアウトされました。再度サインインするまで、既にインストール済みのバージョンだけプレイできます。
+error.steam.signin.fail=Steamで認証できませんでした: {0}
+
+bottomPanel.version=Multimyth バージョン {0}
+
+# .lang ファイルは .properties ファイルと同じ仕様を使用します。.properties ファイルの仕様については、https://docs.oracle.com/javase/jp/21/docs/api/java.base/java/util/Properties.html#load(java.io.Reader) をご覧ください。
+#
+# 以下は .lang の追加機能です
+#
+# フォント選択ルール:
+# 1. special.font.contain.must=[cjk]
+#    - フォント名に「cjk」が必須（大文字小文字は区別しない）
+#    - パイプ文字「|」でOR条件を指定可能（例: [cjk| jp] = 「cjk」または「 jp」が必須）
+#    - この条件を満たさないフォントは除外
+#
+# 2. special.font.contain.must.not=[bold|light|italic|thick|thin]
+#    - フォント名に指定された単語の「いずれか」を含むフォントは除外（OR条件）
+#    - 例: [bold|light] = 「bold」または「light」のいずれかを含むフォントを除外
+#    - 注意: '[bold][italic]' のようにAND条件で指定しないでください（「boldかつitalic」を同時に含むフォントのみ除外するため、意図した動作になりません）
+#
+# 3. special.font.prefer=[sans][noto][regular]
+#    - 各[]内の条件に一致するごとにスコアを加算（AND条件として機能）
+#    - パイプ文字「|」でOR条件を指定可能（例: [sans|serif] = 「sans」または「serif」で1点）
+#    - 例: "Noto Sans CJK Regular" → [sans][noto][regular]の3つに一致 → スコア3点
+#
+# 選択プロセス:
+#   must条件を満たし、must.not条件を満たさないフォントの中から、
+#   preferのスコアが最も高いフォントが選択される
+#   すべての文字列比較は大文字小文字を区別しません
+
+special.font.contain.must=[cjk| jp]
+special.font.contain.must.not=[bold|light|italic|thick|thin|heavy|medium]
+special.font.prefer=[sans][noto][mono][regular]
+special.font.size=16

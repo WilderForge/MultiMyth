@@ -12,11 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.wildermods.multimyth.I18N;
 import com.wildermods.multimyth.MainApplication;
 import com.wildermods.multimyth.internal.CompileStrictly;
 import com.wildermods.thrixlvault.exception.VersionParsingException;
@@ -41,49 +41,58 @@ public class MainWindow extends MultimythTable {
 	private Cell<MultimythTable> sidePanelCell;
 	private Cell<MultimythTable> bottomPanelCell;
 	
+	private boolean dirty = true;
+	
 	public MainWindow(Skin skin) {
 		super(skin);
 		//debug();
 		setSkin(skin);
-		
-		topPanel = new MultimythTable(skin);
-		sidePanel = new MultimythTable(skin);
+		build();
+	}
+	
+	public void build() {
 		
 		// Create the grid and wrap it in a Container for proper alignment
+		topPanel = new MultimythTable(this.getSkin());
+		sidePanel = new MultimythTable(this.getSkin());
+		
 		grid = new Grid(128);
 		Table gridContainer = new Table();
 		gridContainer.add(grid).align(Align.topLeft).expandX().fillX();
-		gridContainer.top().left(); // Force top-left alignment
+		gridContainer.top().left();
 		
-		mainPanel = new AutoFocusingScrollPane(gridContainer, skin);
-		bottomPanel = new MultimythTable(skin);
+		mainPanel = new AutoFocusingScrollPane(gridContainer, this.getSkin());
+		bottomPanel = new MultimythTable(this.getSkin());
 		
 		setFillParent(true);
 		pad(16f);
-		this.setBackground(skin.getDrawable("window"));
+		this.setBackground(this.getSkin().getDrawable("window"));
 		
 		topPanelCell = this.add(topPanel).colspan(2);
 		topPanelCell.expandX().fill().row();
 		addTopPanelStuff(topPanel);
-
 		topPanel.setBackground(createSolidColorDrawable(Color.RED));
 		
-		// Add the scroll pane directly
 		this.add(mainPanel).expand().fillX().align(Align.topLeft);
-		//mainPanel.debugAll();
 		mainPanel.setScrollingDisabled(true, false);
 		mainPanel.setFadeScrollBars(false);
 		mainPanel.setScrollbarsVisible(true);
 		
 		this.add(sidePanel).width(256).fillY();
 		sidePanel.background(createSolidColorDrawable(Color.BLUE));
-		addMainPanelStuff(grid);
 		
 		this.row();
 		
 		this.add(bottomPanel).colspan(2).expandX().fill();
 		bottomPanel.background(createSolidColorDrawable(Color.GREEN));
 		addBottomPanelStuff(bottomPanel);
+		
+		// Add main panel stuff AFTER the UI structure is built
+		addMainPanelStuff(grid);
+		
+		// Force initial layout
+		invalidateHierarchy();
+		validate();
 	}
 	
 	private void addMainPanelStuff(Grid actor) {
@@ -122,19 +131,19 @@ public class MainWindow extends MultimythTable {
 	}
 	
 	private void addTopPanelStuff(MultimythTable topPanel) {
-		topPanel.add(new ImageTextButton("New Instance", getSkin()).pad(5f)).space(5f);
-		topPanel.add(new ImageTextButton("Folders", getSkin()).pad(5f)).space(5f);
-		topPanel.add(new ImageTextButton("Settings", getSkin()).pad(5f)).space(5f);
-		topPanel.add(new ImageTextButton("Update", getSkin()).pad(5f)).space(5f);
-		topPanel.add(new ImageTextButton("Help", getSkin()).pad(5f)).space(5f);
+		topPanel.add(new ImageTextButton(I18N.translate("topPanel.newInstance"), getSkin()).pad(5f)).space(5f);
+		topPanel.add(new ImageTextButton(I18N.translate("topPanel.folders"), getSkin()).pad(5f)).space(5f);
+		topPanel.add(new ImageTextButton(I18N.translate("topPanel.settings"), getSkin()).pad(5f)).space(5f);
+		topPanel.add(new ImageTextButton(I18N.translate("topPanel.update"), getSkin()).pad(5f)).space(5f);
+		topPanel.add(new ImageTextButton(I18N.translate("topPanel.help"), getSkin()).pad(5f)).space(5f);
 		topPanel.add().expandX().fillX();
-		topPanel.add(new Label("Not logged in to steam.", getSkin()));
+		topPanel.add(new Label(I18N.translate("topPanel.steam.notLoggedIn"), getSkin()));
 	}
 	
 	private void addBottomPanelStuff(MultimythTable bottomPanel) {
 		bottomPanel.add(new ImageTextButton("Lorem Ipsum", getSkin()).pad(5f)).space(5f);
 		bottomPanel.add().expandX().fillX();
-		bottomPanel.add(new Label("Multimyth version " + MainApplication.VERSION, getSkin()));
+		bottomPanel.add(new Label(I18N.translate("bottomPanel.version", MainApplication.VERSION), getSkin()));
 	}
 	
 	private void addInstanceToUI() {

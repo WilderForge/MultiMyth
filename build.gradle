@@ -80,9 +80,22 @@ subprojects {
 	  api libs.asm.util
 	  api libs.asm.tree
 	  api libs.fabric.loader
+	  api libs.fontbox
+	  api libs.freetype
+	  api variantOf(libs.freetype.platform) {
+	  	classifier("natives-desktop")
+	  }
 	  api libs.thrixlvault
 	  api libs.maven.fetcher
 	  api libs.workspace
+	  
+	  testImplementation libs.junit.api
+	  testImplementation libs.junit.platform.suite
+	  testImplementation libs.junit.engine
+  }
+  
+  test {
+    useJUnitPlatform()
   }
   
 }

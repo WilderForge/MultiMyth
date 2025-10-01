@@ -1,0 +1,10 @@
+topPanel.newInstance=New Instance
+topPanel.folders=Folders
+topPanel.settings=Settings
+topPanel.update=Update
+topPanel.help=Help
+topPanel.steam.notLoggedIn=Not logged in to steam. ASLKJEDF
+
+error.ass=This machine is ass. Session Terminated.
+
+bottomPanel.version=Multimyth version {0}
