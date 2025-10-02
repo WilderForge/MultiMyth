@@ -38,6 +38,10 @@ public record I18N(Locale locale, Properties translations, Data data) {
 		this(locale, loadTranslations(locale), new Data());
 	}
 	
+	public I18N(Locale locale, Properties translations) {
+		this(locale, translations, new Data());
+	}
+	
 	public String itranslate(String key, Object... objects) {
 		return iformat(
 			translations.getProperty(key, "<" + locale + ":" + key + ">"),
