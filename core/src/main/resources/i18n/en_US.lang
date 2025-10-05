@@ -3,8 +3,23 @@ topPanel.folders=Folders
 topPanel.settings=Settings
 topPanel.update=Update
 topPanel.help=Help
-topPanel.steam.notLoggedIn=Not logged in to steam. ASLKJEDF
+topPanel.steam.notLoggedIn=Not logged in to steam.
+topPanel.steam.loggedIn=Welcome, {0}
+
+sidePanel.launch=Launch
+sidePanel.edit=Edit Instance
+sidePanel.view.mods=View Mods
+sidePanel.screenshots=View Screenshots
+sidePanel.installFolder=Install Folder
+sidePanel.configFolder=Config Folder
+sidePanel.modFolder=Mod Folder
+sidePanel.shortcut=Create Shortcut
+sidePanel.delete=Delete
+sidePanel.clone=Copy Instance
 
 error.ass=This machine is ass. Session Terminated.
+error.unexpected=Unexpected Error Occurred: {0}
+error.steam.signedout=You have been signed out of Steam. Until you sign in again, you can only play versions that are already installed.
+error.steam.signin.fail=Failed to authenticate with Steam: {0}
 
 bottomPanel.version=Multimyth version {0}
