@@ -12,6 +12,7 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 @CompileStrictly("1.8")
@@ -23,7 +24,7 @@ public class JavaInstance implements JVM {
 	
 	public final String version;
 	public final Path jvmLocation;
-	private final Path launchDir;
+	private final transient Path launchDir;
 	private transient Properties properties;
 	
 	JavaInstance(String version, Path jvmLocation, Path launchDir) {
@@ -32,11 +33,19 @@ public class JavaInstance implements JVM {
 		this.launchDir = launchDir;
 	}
 	
-	JavaInstance() throws IOException {
-		this.version = JAVA_SPEC_VERSION;
-		this.jvmLocation = currentJVMBinaryPath();
-		this.properties = System.getProperties();
-		this.launchDir = Paths.get(System.getProperty("user.dir"));
+	JavaInstance(String version, Path jvmLocation, Path launchDir, Properties properties) {
+		this.version = version;
+		this.jvmLocation = jvmLocation;
+		this.launchDir = launchDir;
+		this.properties = properties;
+	}
+	
+	JavaInstance() {
+		this(JAVA_SPEC_VERSION, currentJVMBinaryPath(), Paths.get(System.getProperty("user.dir")), System.getProperties());
+	}
+	
+	public static JavaInstance fromCurrentVM() {
+		return new JavaInstance();
 	}
 	
 	public static JavaInstance fromPath(Path jvmLocation, Path launchDir) throws IOException {
@@ -61,7 +70,6 @@ public class JavaInstance implements JVM {
 		);
 		
 		pb.directory(launchDir.toFile());
-		pb.redirectErrorStream(true);
 		
 		try {
 			Process process = pb.start();
@@ -133,6 +141,19 @@ public class JavaInstance implements JVM {
 	
 	public final Path getLaunchDir() {
 		return launchDir;
+	}
+	
+	@Override
+	public final boolean equals(Object o) {
+		if(o instanceof JavaInstance) {
+			return Objects.equals(this.jvmLocation, ((JavaInstance)o).jvmLocation) && Objects.equals(this.version, ((JavaInstance)o).version);
+		}
+		return false;
+	}
+	
+	@Override
+	public final int hashCode() {
+		return Objects.hash(this.jvmLocation.toAbsolutePath(), this.version);
 	}
 
 	@Override
