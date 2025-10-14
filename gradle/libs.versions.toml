@@ -1,5 +1,6 @@
 [versions]
 asm_version = "9.8"
+commons_io_version = "2.20.0"
 fabric_loader_version = "0.17.2+WilderForge.0.2.1"
 fontbox_version = "3.0.5"
 freetype_version="1.13.1"
@@ -19,6 +20,7 @@ asm_commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm_version" 
 asm_tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm_version" }
 asm_util = { module = "org.ow2.asm:asm-util", version.ref = "asm_version" }
 
+commons_io = { module = "commons-io:commons-io", version.ref = "commons_io_version" }
 fabric-loader = { module = "com.wildermods:fabric-loader", version.ref = "fabric_loader_version" }
 fontbox = { module = "org.apache.pdfbox:fontbox", version.ref = "fontbox_version" }
 freetype = { module = "com.badlogicgames.gdx:gdx-freetype", version.ref = "freetype_version" }

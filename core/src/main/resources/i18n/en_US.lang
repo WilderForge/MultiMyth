@@ -1,3 +1,11 @@
+ok=Ok
+cancel=Cancel
+add=Add
+remove=Remove
+delete=Delete
+enable=Enable
+disable=Disable
+
 topPanel.newInstance=New Instance
 topPanel.folders=Folders
 topPanel.settings=Settings
@@ -14,12 +22,47 @@ sidePanel.installFolder=Install Folder
 sidePanel.configFolder=Config Folder
 sidePanel.modFolder=Mod Folder
 sidePanel.shortcut=Create Shortcut
-sidePanel.delete=Delete
 sidePanel.clone=Copy Instance
+
+bottomPanel.version=Multimyth version {0}
+
+instance.edit.window.misc.header.name=Name
+instance.edit.window.misc.header.version=Version
+instance.edit.window.misc.header.changed=Last Changed
+
+instance.edit.window.saves.header.difficulty=Difficulty
+instance.edit.window.saves.header.played=Last Played
+
+instance.edit.window=Edit Window for {0}
+instance.edit.window.version=Version
+instance.edit.window.mods=Mods
+instance.edit.window.saves=Saves
+
+instance.edit.window.settings=Settings
+instance.edit.window.settings.java=Java
+instance.edit.window.settings.java.override=Java Installation
+instance.edit.window.settings.java.override.java.auto=Auto-Detect
+instance.edit.window.settings.java.override.java.browse=Browse
+instance.edit.window.settings.java.override.java.test=Test
+instance.edit.window.settings.java.override.memory=Memory
+instance.edit.window.settings.java.override.memory.min=Minimum Memory Allocation:
+instance.edit.window.settings.java.override.memory.max=Maximum Memory Allocation:
+instance.edit.window.settings.java.override.args=Java Arguments
+
+instance.edit.window.settings.console=Console Settings
+instance.edit.window.settings.console.show=Show console while the game is running?
+instance.edit.window.settings.console.close=Automatically close console when the game quits?
+instance.edit.window.settings.console.crash=Show console when the game crashes?
+
+instance.edit.window.logs=Logs
+instance.edit.window.logs.reload=Reload
+instance.edit.window.logs.copy=Copy to Clipboard
+instance.edit.window.logs.upload=Upload
+instance.edit.window.logs.clean=Clean
+
+instance.edit.window.logs.clean.confirm=Are you sure you want to delete all log files?
 
 error.ass=This machine is ass. Session Terminated.
 error.unexpected=Unexpected Error Occurred: {0}
 error.steam.signedout=You have been signed out of Steam. Until you sign in again, you can only play versions that are already installed.
 error.steam.signin.fail=Failed to authenticate with Steam: {0}
-
-bottomPanel.version=Multimyth version {0}

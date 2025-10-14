@@ -79,6 +79,7 @@ subprojects {
 	  api libs.asm.commons
 	  api libs.asm.util
 	  api libs.asm.tree
+	  api libs.commons.io
 	  api libs.fabric.loader
 	  api libs.fontbox
 	  api libs.freetype

@@ -50,6 +50,11 @@ def compileJava8 = tasks.register('compileJava8', JavaCompile) {
     })
 }
 
+dependencies {
+      testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+      testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+}
+
 tasks.compileJava {
     dependsOn compileJava8
 

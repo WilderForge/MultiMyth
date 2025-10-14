@@ -1,8 +1,12 @@
 package com.wildermods.multimyth.test;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +19,11 @@ class I18NTest {
 
 	private I18N i18n;
 
+	@BeforeAll
+	static void initialize() {
+		Gdx.files = new Lwjgl3Files();
+	}
+	
 	@BeforeEach
 	void setUp() throws IOException {
 		try(InputStream in = getClass().getClassLoader().getResourceAsStream("i18n/en_US.lang")) {
