@@ -12,8 +12,10 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 @CompileStrictly("1.8")
 public class JavaInstance implements JVM {
@@ -60,6 +62,21 @@ public class JavaInstance implements JVM {
 			launchDir.resolve("lib").resolve("*").toAbsolutePath().toString()
 		);
 		
+		boolean isDevelopment = classpathEntries.stream().anyMatch((entry) -> {
+			return entry.contains("/bin/java8") || entry.contains("/bin/main") || entry.contains("/bin/test");
+		});
+		
+		if(isDevelopment) {
+			ListIterator<String> i = classpathEntries.listIterator();
+			while(i.hasNext()) {
+				String classpathEntry = i.next();
+				classpathEntry = classpathEntry.replace("/bin/java8", "/build/classes/java/java8");
+				classpathEntry = classpathEntry.replace("/bin/main", "/build/classes/java/main");
+				classpathEntry = classpathEntry.replace("/bin/test", "/build/classes/java/test");
+				i.set(classpathEntry);
+			}
+		}
+		
 		String fullClasspath = String.join(File.pathSeparator, classpathEntries);
 		
 		ProcessBuilder pb = new ProcessBuilder(
@@ -72,6 +89,14 @@ public class JavaInstance implements JVM {
 		pb.directory(launchDir.toFile());
 		
 		try {
+			/*
+				for(String arg : pb.command()) {
+					System.out.print(arg);
+					System.out.print(" ");
+				}
+				System.out.println();
+			*/
+
 			Process process = pb.start();
 			Properties properties = new Properties();
 			boolean parsingProperties = false;
@@ -107,6 +132,9 @@ public class JavaInstance implements JVM {
 				e.printStackTrace();
 			}
 			
+			if(!process.waitFor(5, TimeUnit.SECONDS)) {
+				process.destroyForcibly();
+			}
 			int exitCode = process.waitFor();
 			if(exitCode != 0 || properties.isEmpty() || !finished) {
 				throw new IOException("Failed to read properties from JVM at " + jvmLocation + " (Exit code: " + exitCode + ")");
