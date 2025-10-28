@@ -44,7 +44,7 @@ public class Installer<Game extends IDownloadable> {
 	
 	public void install() throws IOException, InterruptedException, IntegrityException, ExecutionException {
 		if(game instanceof WildermythManifest) {
-			installThrixlvault(new Install<>((WildermythManifest)game, dir, true));
+			installThrixlvault(new Install<>((WildermythManifest)game, dir, JVMInstance.thisVM(), true));
 		}
 		else if (game instanceof GameOnDisk) {
 			

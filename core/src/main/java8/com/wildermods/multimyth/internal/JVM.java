@@ -10,7 +10,7 @@ import java.util.Properties;
  * <p>
  * It is annotated with {@code @CompileStrictly("1.8")} to ensure compatibility with older JVM targets.
  * 
- * @see JavaInstance
+ * @see JVMBinary
  */
 @FunctionalInterface
 @CompileStrictly("1.8")

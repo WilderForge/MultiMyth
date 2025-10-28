@@ -1,56 +1,57 @@
 package com.wildermods.multimyth.internal;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Base64.Decoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 import java.util.Properties;
+import java.util.Base64.Decoder;
 import java.util.concurrent.TimeUnit;
 
-@CompileStrictly("1.8")
-public class JavaInstance implements JVM {
+public class JVMInstance extends JVMBinary implements JVM {
 
-	private static final String JAVA_HOME = System.getProperty("java.home");
-	private static final String JAVA_SPEC_VERSION_KEY = "java.specification.version";
-	private static final String JAVA_SPEC_VERSION = System.getProperty(JAVA_SPEC_VERSION_KEY);
+	private final Properties properties;
 	
-	public final String version;
-	public final Path jvmLocation;
-	private final transient Path launchDir;
-	private transient Properties properties;
-	
-	JavaInstance(String version, Path jvmLocation, Path launchDir) {
-		this.version = version;
-		this.jvmLocation = jvmLocation;
-		this.launchDir = launchDir;
+	JVMInstance(String version, Path jvmLocation) {
+		this(new JVMBinary(version, jvmLocation));
 	}
 	
-	JavaInstance(String version, Path jvmLocation, Path launchDir, Properties properties) {
-		this.version = version;
-		this.jvmLocation = jvmLocation;
-		this.launchDir = launchDir;
+	JVMInstance(String version, Path jvmLocation, Properties properties) {
+		this(new JVMBinary(version, jvmLocation), properties);
+	}
+	
+	JVMInstance(JVMBinary binary) {
+		this(binary, new Properties());
+	}
+	
+	JVMInstance(JVMBinary binary, Properties properties) {
+		super(binary.version, binary.jvmLocation);
 		this.properties = properties;
 	}
 	
-	JavaInstance() {
-		this(JAVA_SPEC_VERSION, currentJVMBinaryPath(), Paths.get(System.getProperty("user.dir")), System.getProperties());
+	public JVMInstance(InputStream stream) throws SerializationException {
+		super(this.properties = deserialize(stream));
 	}
 	
-	public static JavaInstance fromCurrentVM() {
-		return new JavaInstance();
+	public static JVMInstance thisVM() {
+		JVMInstance current = new JVMInstance(JAVA_SPEC_VERSION, currentJVMBinaryPath(), System.getProperties());
+		if(!current.isValid()) {
+			throw new AssertionError();
+		}
+		return current;
 	}
 	
-	public static JavaInstance fromPath(Path jvmLocation, Path launchDir) throws IOException {
+	public static JVMBinary fromPath(Path jvmLocation, Path launchDir) throws IOException {
 		
 		String currentClasspath = System.getProperty("java.class.path");
 		List<String> classpathEntries = new ArrayList<>();
@@ -144,8 +145,7 @@ public class JavaInstance implements JVM {
 				throw new IOException("External JVM didn't report version: " + jvmLocation);
 			}
 			
-			JavaInstance jvm = new JavaInstance(version, jvmLocation, launchDir);
-			jvm.properties = properties;
+			JVMInstance jvm = new JVMInstance(version, jvmLocation, properties);
 			
 			return jvm;
 		}
@@ -154,51 +154,25 @@ public class JavaInstance implements JVM {
 		}
 	}
 	
-	
-	public boolean isValid() {
-		return version != null && version.length() > 0 && Files.exists(jvmLocation) && properties != null && !properties.isEmpty();
-	}
-	
-	public final String getVersion() {
-		return version;
-	}
-	
-	public final Path getJVMLocation() {
-		return jvmLocation;
-	}
-	
-	public final Path getLaunchDir() {
-		return launchDir;
-	}
-	
-	@Override
-	public final boolean equals(Object o) {
-		if(o instanceof JavaInstance) {
-			return Objects.equals(this.jvmLocation, ((JavaInstance)o).jvmLocation) && Objects.equals(this.version, ((JavaInstance)o).version);
-		}
-		return false;
-	}
-	
-	@Override
-	public final int hashCode() {
-		return Objects.hash(this.jvmLocation.toAbsolutePath(), this.version);
-	}
-
 	@Override
 	public final Properties getProperties() {
 		return properties;
 	}
 	
-	public static JavaInstance ofCurrent() throws IOException {
-		JavaInstance current = new JavaInstance();
-		if(!current.isValid()) {
-			throw new AssertionError();
+	public OutputStream serialize() throws SerializationException {
+		properties.put("version", version);
+		properties.put("jvmLocation", jvmLocation.toString());
+		ByteArrayOutputStream ret = new ByteArrayOutputStream();
+		try {
+			properties.storeToXML(ret, null, "utf8");
+		} catch (IOException e) {
+			throw new SerializationException(e);
 		}
-		return current;
+		return ret;
 	}
 	
-	private static Path currentJVMBinaryPath() {
-		return Paths.get(JAVA_HOME).resolve("bin").resolve("java" + OS.getOS().applicationExtension);
+	public boolean isValid() {
+		return version != null && version.length() > 0 && Files.exists(jvmLocation) && properties != null && !properties.isEmpty();
 	}
-	
+
 }

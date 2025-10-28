@@ -13,9 +13,9 @@ public class JavaFinder {
 	
 	private static final Path relativeExecutablePath = Paths.get("bin", "java" + OS.getOS().applicationExtension);
 	
-	public HashSet<JavaInstance> locate(Path... searchPaths) {
-		HashSet<JavaInstance> ret = new HashSet<>();
-		ret.add(JavaInstance.fromCurrentVM()); //make sure the current vm is added
+	public HashSet<JVMBinary> locate(Path... searchPaths) {
+		HashSet<JVMBinary> ret = new HashSet<>();
+		ret.add(JVMInstance.thisVM()); //make sure the current vm is added
 		LinkedHashSet<Path> searchLocs = new LinkedHashSet<>();
 		searchLocs.addAll(Arrays.asList(searchPaths));
 		switch(OS.getOS()) {
@@ -43,7 +43,7 @@ public class JavaFinder {
 			if(Files.isRegularFile(p)) {
 				try {
 					if(p.endsWith("java" + OS.getOS().applicationExtension)) {
-						JavaInstance instance = JavaInstance.fromPath(p, Paths.get("."));
+						JVMBinary instance = JVMInstance.fromPath(p, Paths.get("."));
 						ret.add(instance);
 					}
 					else {
@@ -60,7 +60,7 @@ public class JavaFinder {
 						Path javaExecutable = child.resolve(relativeExecutablePath);
 						if(Files.exists(javaExecutable)) {
 							try {
-								JavaInstance instance = JavaInstance.fromPath(javaExecutable, Paths.get("."));
+								JVMBinary instance = JVMInstance.fromPath(javaExecutable, Paths.get("."));
 								ret.add(instance);
 							} catch (IOException e) {
 								e.printStackTrace();
