@@ -1,7 +1,6 @@
 package com.wildermods.multimyth;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -45,7 +44,7 @@ public class MainApplication extends ApplicationAdapter {
 	public void create() {
 		I18N.supportedLocales().forEach((locale) -> System.out.println(locale));
 		try {
-			I18N.INSTANCE = new I18N(Locale.JAPAN);
+			I18N.INSTANCE = new I18N();
 		} catch (IOException e) {
 			e.printStackTrace();
 			try {
