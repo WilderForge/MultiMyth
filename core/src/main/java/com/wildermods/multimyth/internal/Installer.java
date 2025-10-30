@@ -23,6 +23,7 @@ import com.wildermods.thrixlvault.ChrysalisizedVault;
 import com.wildermods.thrixlvault.MassDownloadWeaver;
 import com.wildermods.thrixlvault.exception.MissingVersionException;
 import com.wildermods.thrixlvault.steam.IDownloadable;
+import com.wildermods.thrixlvault.steam.IGame;
 import com.wildermods.thrixlvault.utils.FileUtil;
 import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
 import com.wildermods.workspace.WilderWorkspacePluginImpl;
@@ -32,7 +33,7 @@ import com.wildermods.workspace.dependency.ProjectDependencyType;
 import com.wildermods.workspace.dependency.WWProjectDependency;
 import com.wildermods.workspace.util.FileHelper;
 
-public class Installer<Game extends IDownloadable> {
+public class Installer<Game extends IDownloadable & IGame> {
 
 	private final Game game;
 	private final Path dir;
@@ -67,7 +68,7 @@ public class Installer<Game extends IDownloadable> {
 		
 		c.export(dir, true);
 		
-		if(install.isCoremodInstall()) {
+		if(install.isCoremodded()) {
 			installCoremodEnvironment((Install<Game>) install);
 		}
 		

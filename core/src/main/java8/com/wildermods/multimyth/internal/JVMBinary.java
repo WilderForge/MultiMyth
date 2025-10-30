@@ -1,13 +1,13 @@
 package com.wildermods.multimyth.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
+
+import com.google.gson.Gson;
 
 @CompileStrictly("1.8")
 public class JVMBinary {
@@ -73,17 +73,9 @@ public class JVMBinary {
 		return Paths.get(JAVA_HOME).resolve("bin").resolve("java" + OS.getOS().applicationExtension);
 	}
 
-	public OutputStream serialize() throws SerializationException {
-		Properties properties = new Properties();
-		properties.put("version", version);
-		properties.put("jvmLocation", jvmLocation.toString());
-		ByteArrayOutputStream ret = new ByteArrayOutputStream();
-		try {
-			properties.storeToXML(ret, null, "utf8");
-		} catch (IOException e) {
-			throw new SerializationException(e);
-		}
-		return ret;
+	public String serialize() throws SerializationException {
+		Gson gson = GsonHelper.GSON;
+		return gson.toJson(this);
 	}
 	
 }

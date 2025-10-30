@@ -1,12 +1,10 @@
 package com.wildermods.multimyth.internal;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -157,18 +155,6 @@ public class JVMInstance extends JVMBinary implements JVM {
 	@Override
 	public final Properties getProperties() {
 		return properties;
-	}
-	
-	public OutputStream serialize() throws SerializationException {
-		properties.put("version", version);
-		properties.put("jvmLocation", jvmLocation.toString());
-		ByteArrayOutputStream ret = new ByteArrayOutputStream();
-		try {
-			properties.storeToXML(ret, null, "utf8");
-		} catch (IOException e) {
-			throw new SerializationException(e);
-		}
-		return ret;
 	}
 	
 	public boolean isValid() {

@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.wildermods.thrixlvault.steam.IDownloadable;
+import com.wildermods.thrixlvault.steam.IGame;
+import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
 import com.wildermods.workspace.util.OS;
 
-public class GameOnDisk implements IDownloadable {
+public class GameOnDisk implements IDownloadable, IGame {
 	private final Path path;
 	
 	public GameOnDisk() {
@@ -44,6 +46,16 @@ public class GameOnDisk implements IDownloadable {
 	
 	public Path getPath() {
 		return path;
+	}
+
+	@Override
+	public long game() {
+		return WildermythManifest.GAME_ID;
+	}
+	
+	@Override
+	public String gameName() {
+		return WildermythManifest.GAME_NAME;
 	}
 	
 }
