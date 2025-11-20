@@ -37,8 +37,13 @@ public class JVMInstance extends JVMBinary implements JVM {
 		this.properties = properties;
 	}
 	
+	JVMInstance(Properties properties) {
+		super(properties);
+		this.properties = properties;
+	}
+	
 	public JVMInstance(InputStream stream) throws SerializationException {
-		super(this.properties = deserialize(stream));
+		this(deserialize(stream));
 	}
 	
 	public static JVMInstance thisVM() {

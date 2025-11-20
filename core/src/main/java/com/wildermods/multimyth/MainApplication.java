@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton.ImageTextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -20,6 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.wildermods.multimyth.internal.CompileStrictly;
 import com.wildermods.multimyth.internal.Steam;
 import com.wildermods.multimyth.ui.MainWindow;
+import com.wildermods.multimyth.ui.NewInstanceWindow;
 
 @CompileStrictly
 public class MainApplication extends ApplicationAdapter {
@@ -84,6 +86,7 @@ public class MainApplication extends ApplicationAdapter {
 		//TODO: this is a really shit way of doing this. Need to learn how to properly set styles
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 		BitmapFont font = I18N.getFont();
+		Window.WindowStyle windowStyle = skin.get(Window.WindowStyle.class);
 		if(font != null) {
 			skin.add("default", font, BitmapFont.class);
 			skin.add("font", font, BitmapFont.class);
@@ -94,7 +97,13 @@ public class MainApplication extends ApplicationAdapter {
 			ImageTextButtonStyle buttonStyle = skin.get(ImageTextButtonStyle.class);
 			labelStyle.font = font;
 			buttonStyle.font = font;
+			windowStyle.titleFont = font;
+
 		}
+		windowStyle.background.setTopHeight(25);
+		windowStyle.background.setLeftWidth(10);
+		windowStyle.background.setRightWidth(10);
+		windowStyle.background.setBottomHeight(10);
 		
 		for (ObjectMap.Entry<String, Drawable> entry : skin.getAll(Drawable.class)) {
 			System.out.println("Drawable: " + entry.key);
@@ -125,6 +134,12 @@ public class MainApplication extends ApplicationAdapter {
 	public void dispose() {
 		stage.dispose();
 		skin.dispose();
+	}
+	
+	public void fireNewInstance() {
+		NewInstanceWindow popup = new NewInstanceWindow(skin);
+		stage.addActor(popup);
+		popup.centerOnStage(stage);
 	}
 	
 	public Skin getSkin() {

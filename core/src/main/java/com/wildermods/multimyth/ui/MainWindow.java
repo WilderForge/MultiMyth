@@ -4,17 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.wildermods.multimyth.I18N;
 import com.wildermods.multimyth.MainApplication;
@@ -71,7 +68,7 @@ public class MainWindow extends MultimythTable {
 		topPanelCell = this.add(topPanel).colspan(2);
 		topPanelCell.expandX().fill().row();
 		addTopPanelStuff(topPanel);
-		topPanel.setBackground(createSolidColorDrawable(Color.RED));
+		topPanel.setBackground(UIHelper.createSolidColorDrawable(Color.RED));
 		
 		this.add(mainPanel).expand().fillX().align(Align.topLeft);
 		mainPanel.setScrollingDisabled(true, false);
@@ -79,12 +76,12 @@ public class MainWindow extends MultimythTable {
 		mainPanel.setScrollbarsVisible(true);
 		
 		this.add(sidePanel).width(256).fillY();
-		sidePanel.background(createSolidColorDrawable(Color.BLUE));
+		sidePanel.background(UIHelper.createSolidColorDrawable(Color.BLUE));
 		
 		this.row();
 		
 		this.add(bottomPanel).colspan(2).expandX().fill();
-		bottomPanel.background(createSolidColorDrawable(Color.GREEN));
+		bottomPanel.background(UIHelper.createSolidColorDrawable(Color.GREEN));
 		addBottomPanelStuff(bottomPanel);
 		
 		// Add main panel stuff AFTER the UI structure is built
@@ -131,7 +128,15 @@ public class MainWindow extends MultimythTable {
 	}
 	
 	private void addTopPanelStuff(MultimythTable topPanel) {
-		topPanel.add(new ImageTextButton(I18N.translate("topPanel.newInstance"), getSkin()).pad(5f)).space(5f);
+		ImageTextButton newInstanceButton = new ImageTextButton(I18N.translate("topPanel.newInstance"), getSkin());
+		topPanel.add(newInstanceButton.pad(5f)).space(5f);
+		newInstanceButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				MainApplication.INSTANCE.fireNewInstance();
+			}
+		});
+		
 		topPanel.add(new ImageTextButton(I18N.translate("topPanel.folders"), getSkin()).pad(5f)).space(5f);
 		topPanel.add(new ImageTextButton(I18N.translate("topPanel.settings"), getSkin()).pad(5f)).space(5f);
 		topPanel.add(new ImageTextButton(I18N.translate("topPanel.update"), getSkin()).pad(5f)).space(5f);
@@ -152,15 +157,6 @@ public class MainWindow extends MultimythTable {
 	
 	public MainWindow() {
 		this(null);
-	}
-	
-	private static Drawable createSolidColorDrawable(Color color) {
-		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-		pixmap.setColor(color);
-		pixmap.fill();
-		Texture texture = new Texture(pixmap);
-		pixmap.dispose();
-		return new TextureRegionDrawable(new TextureRegion(texture));
 	}
 
 }

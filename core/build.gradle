@@ -26,7 +26,7 @@ sourceSets {
         java {
             srcDirs = ['src/main/java8']
         }
-        compileClasspath = files()
+        compileClasspath = files() + sourceSets.java8.compileClasspath
     }
 
     main {
@@ -42,7 +42,7 @@ def compileJava8 = tasks.register('compileJava8', JavaCompile) {
 	}
     source = sourceSets.java8.java
     destinationDirectory = file("$buildDir/classes/java/java8")
-    classpath = files()
+    classpath = files() + sourceSets.java8.compileClasspath
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
     javaCompiler.set(javaToolchains.compilerFor {
@@ -51,6 +51,7 @@ def compileJava8 = tasks.register('compileJava8', JavaCompile) {
 }
 
 dependencies {
+      java8Implementation libs.gson
       testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
       testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }

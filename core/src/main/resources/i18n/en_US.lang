@@ -2,6 +2,7 @@ ok=Ok
 cancel=Cancel
 add=Add
 remove=Remove
+reset=Reset
 delete=Delete
 enable=Enable
 disable=Disable
@@ -25,6 +26,13 @@ sidePanel.shortcut=Create Shortcut
 sidePanel.clone=Copy Instance
 
 bottomPanel.version=Multimyth version {0}
+
+instance.create.label.window=Name:
+instance.create.header.version=Version
+instance.create.header.type=Type
+instance.create.header.type.release=Releases
+instance.create.header.type.beta=Betas
+instance.create.header.type.import=Imports
 
 instance.edit.window.misc.header.name=Name
 instance.edit.window.misc.header.version=Version
