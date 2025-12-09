@@ -1,6 +1,7 @@
 package com.wildermods.multimyth;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -22,6 +23,8 @@ import com.wildermods.multimyth.internal.CompileStrictly;
 import com.wildermods.multimyth.internal.Steam;
 import com.wildermods.multimyth.ui.MainWindow;
 import com.wildermods.multimyth.ui.NewInstanceWindow;
+import com.wildermods.thrixlvault.utils.OS;
+import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
 
 @CompileStrictly
 public class MainApplication extends ApplicationAdapter {
@@ -35,7 +38,14 @@ public class MainApplication extends ApplicationAdapter {
 		gson = builder.create();
 	}
 	
-	private Steam steam;
+	private Steam steam = new Steam() {
+
+		@Override
+		public String username() {
+			return "wilderforge";
+		}
+		
+	};
 	private Stage stage;
 	private MainWindow mainWindow;
 	private Skin skin;
@@ -114,6 +124,11 @@ public class MainApplication extends ApplicationAdapter {
 		stage.addActor(mainWindow);
 
 		Gdx.input.setInputProcessor(stage);
+		Gdx.graphics.setWindowedMode(Gdx.graphics.getDisplayMode().width / 2, Gdx.graphics.getDisplayMode().height / 2);
+		
+		for(WildermythManifest manifest : WildermythManifest.manifestStream(OS.getOS()).sorted().collect(Collectors.toList())) {
+			System.out.println(manifest.asVersion().version());
+		}
 	}
 
 	@Override

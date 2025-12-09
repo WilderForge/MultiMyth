@@ -7,6 +7,13 @@ delete=Delete
 enable=Enable
 disable=Disable
 
+release.release=release
+release.beta=beta
+release.unstable=unstable
+release.latest=latest
+release.old=prior
+release.unknown=unknown
+
 topPanel.newInstance=New Instance
 topPanel.folders=Folders
 topPanel.settings=Settings
