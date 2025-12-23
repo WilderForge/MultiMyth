@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.wildermods.thrixlvault.steam.IDownloadable;
-import com.wildermods.thrixlvault.steam.IGame;
 import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
 import com.wildermods.workspace.util.OS;
 
-public class GameOnDisk implements IDownloadable, IGame {
+public class GameOnDisk implements IInstall {
 	private final Path path;
 	
 	public GameOnDisk() {
@@ -22,7 +20,7 @@ public class GameOnDisk implements IDownloadable, IGame {
 
 	@Override
 	public String name() {
-		return OS.getOS() + " " + version();
+		return OS.getOS() + " " + version() + "  (installed)";
 	}
 
 	@Override
@@ -46,6 +44,11 @@ public class GameOnDisk implements IDownloadable, IGame {
 	
 	public Path getPath() {
 		return path;
+	}
+	
+	@Override
+	public String downloadBlockedReason() {
+		return "Cannot download a game version already on disk.";
 	}
 
 	@Override

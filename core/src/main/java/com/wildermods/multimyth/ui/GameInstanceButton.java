@@ -23,19 +23,5 @@ public class GameInstanceButton extends ImageTextButton {
 		this.row();
 		this.add(getLabel());
 	}
-	/*
-	@Override
-	public float getPrefWidth() {
-	float imageW = (getImage() != null) ? getImage().getPrefWidth() : 0f;
-	float labelW = (getLabel() != null) ? getLabel().getPrefWidth() : 0f;
-	return Math.max(imageW, labelW);
-	}
-
-	@Override
-	public float getPrefHeight() {
-	float imageH = (getImage() != null) ? getImage().getPrefHeight() : 0f;
-	float labelH = (getLabel() != null) ? getLabel().getPrefHeight() : 0f;
-	return imageH + labelH;
-	}*/
 	
 }

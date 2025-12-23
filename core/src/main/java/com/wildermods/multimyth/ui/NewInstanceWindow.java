@@ -1,13 +1,11 @@
 package com.wildermods.multimyth.ui;
 
-import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,34 +17,31 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.wildermods.masshash.exception.IntegrityException;
+
 import com.wildermods.multimyth.I18N;
 import com.wildermods.multimyth.MainApplication;
+import com.wildermods.multimyth.internal.InstallException;
+import com.wildermods.multimyth.internal.Installer;
 import com.wildermods.multimyth.ui.Divider.Orientation;
 import com.wildermods.thrixlvault.ChrysalisizedVault;
-import com.wildermods.thrixlvault.MassDownloadWeaver;
 import com.wildermods.thrixlvault.Vault;
-import com.wildermods.thrixlvault.exception.DatabaseError;
-import com.wildermods.thrixlvault.exception.MissingVersionException;
 import com.wildermods.thrixlvault.exception.VersionParsingException;
-import com.wildermods.thrixlvault.steam.CompletedDownload;
-import com.wildermods.thrixlvault.steam.FailedDownload;
-import com.wildermods.thrixlvault.steam.ISteamDownload;
-import com.wildermods.thrixlvault.steam.SkippedDownload;
 import com.wildermods.thrixlvault.utils.OS;
 import com.wildermods.thrixlvault.utils.version.Version;
 import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
 
-public class NewInstanceWindow extends Window {
-
+public class NewInstanceWindow extends MultimythWindow {
+	
 	private static final Logger LOGGER = LogManager.getLogger(NewInstanceWindow.class);
 	boolean nameEdited = false;
 	WildermythManifest selectedVersion = null;
 	TextField nameField = null;
+	TextButton confirmButton = null;
+	volatile Throwable downloadProblem = null;
 	
 	public NewInstanceWindow(Skin skin) {
 		super(I18N.translate("topPanel.newInstance"), skin);
@@ -71,20 +66,8 @@ public class NewInstanceWindow extends Window {
 		table.row();
 		setupBottomPanel(table, skin);
 		
+		updateButtons();
 		//this.background(UIHelper.createSolidColorDrawable(Color.CORAL));
-	}
-	public void centerOnStage(Stage stage) {
-	    pack(); // ensures width/height are computed
-
-	    setHeight(stage.getHeight() / 2);
-	    setWidth(stage.getWidth() / 4);
-	    
-	    float x = Math.round((stage.getWidth() - getWidth()) / 2f);
-	    float y = Math.round((stage.getHeight() - getHeight()) / 2f);
-	    
-	    setPosition(x, y);
-	    invalidateHierarchy();
-	    validate();
 	}
 	
 	private void setupTitleBar(Skin skin) {
@@ -110,6 +93,7 @@ public class NewInstanceWindow extends Window {
 			@Override
 			public void keyTyped(TextField textField, char c) {
 				nameEdited = true;
+				updateButtons();
 			}
 			
 		});
@@ -217,7 +201,7 @@ public class NewInstanceWindow extends Window {
 	private void setupBottomPanel(MultimythTable table, Skin skin) {
 		MultimythTable bottomPanel = new MultimythTable(skin);
 		TextButton cancelButton = new TextButton("Cancel", skin);
-		TextButton confirmButton = new TextButton("OK", skin);
+		confirmButton = new TextButton("OK", skin);
 		
 		cancelButton.addListener(new ClickListener() {
             @Override
@@ -229,7 +213,10 @@ public class NewInstanceWindow extends Window {
 		confirmButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                create();
+            	if(!confirmButton.isDisabled()) {
+            		NewInstanceWindow.this.remove();
+            		create(new Installer<>(selectedVersion, MainApplication.SAVE_DIR.resolve(nameField.getText()), true), skin);
+            	}
             }
 		});
 		
@@ -243,9 +230,21 @@ public class NewInstanceWindow extends Window {
 	private void select(WildermythManifest manifest) {
 		selectedVersion = manifest;
 		nameField.setText(selectedVersion.version());
+		updateButtons();
 	}
 	
-	public void create() {
+	private void updateButtons() {
+		if(confirmButton != null) {
+			if(Files.exists(MainApplication.SAVE_DIR.resolve(nameField.getText()))) {
+				confirmButton.setDisabled(true);
+			}
+			else {
+				confirmButton.setDisabled(false);
+			}
+		}
+	}
+	
+	public void create(Installer installer, Skin skin) {
 		if(selectedVersion == null) {
 			LOGGER.warn("No version selected?!");
 			return;
@@ -254,55 +253,67 @@ public class NewInstanceWindow extends Window {
 		
 		try {
 			if(!Vault.DEFAULT.hasChrysalis(selectedVersion)) {
-				try {
-					MassDownloadWeaver downloader = new MassDownloadWeaver(MainApplication.INSTANCE.getSteam().username(), Set.of(selectedVersion));
-					Set<ISteamDownload> results = downloader.run(); //TODO: Make it so the program doesn't go unresponsive while downloading
-					if(results.size() == 1) {
-						ISteamDownload result = results.iterator().next();
-						if(result instanceof FailedDownload) {
-							throw new IOException("Download failed", ((FailedDownload) result).failReason());
-						}
-						else if (result instanceof SkippedDownload) {
-							throw new IOException("Download was skipped: " + ((SkippedDownload)result).downloadBlockedReason());
-						}
-						else if (result instanceof CompletedDownload) {
-							//NO-OP
-						}
-						else {
-							throw new AssertionError("Unknown result type: " + result.getClass());
+				AtomicReference<Thread> downloadThread = new AtomicReference<>(null);
+				MultimythWindow downloadingWindow = new MultimythWindow(I18N.translate("popup.downloading.title", selectedVersion.gameName(), selectedVersion.version()), skin);
+				Label downloadingText = new Label(I18N.translate("popup.downloading.text"), skin);
+				TextButton cancelButton = new TextButton(I18N.translate("cancel"), skin);
+				cancelButton.addListener(new ClickListener() {
+					@Override
+					public void clicked(InputEvent event, float x, float y) {
+						Thread t = downloadThread.get();
+						if(t != null) {
+							if(t.isAlive()) {
+								t.interrupt();
+							}
 						}
 					}
-					else {
-						throw new AssertionError("Expected 1 download result, got " + results.size());
+				});
+				
+				downloadingWindow.add(downloadingText);
+				downloadingWindow.row();
+				downloadingWindow.add(cancelButton);
+				MainApplication.INSTANCE.getMainWindow().setVisible(false);
+				
+				downloadThread.set(
+					new Thread(() -> {
+						try {
+							installer.install();
+						}
+						catch(Throwable t) {
+							downloadProblem = t;
+						}
+						finally {
+							downloadingWindow.remove();
+							downloadFinish(skin);
+						}
 					}
-				} catch (InterruptedException e) {
-					throw new IOException(e);
-				}
+				));
+				Stage stage = MainApplication.INSTANCE.getStage();
+				stage.addActor(downloadingWindow);
+				downloadingWindow.centerOnStage(stage);
+				
+				downloadingWindow.setVisible(true);
+				this.setVisible(false);
+				downloadThread.get().start();
 			}
 			
-			if(Vault.DEFAULT.hasChrysalis(selectedVersion)) {
-				try {
-					chrysalis = Vault.DEFAULT.chrysalisize(selectedVersion);
-					try {
-						chrysalis.export(Path.of("/tmp/multimyth/" + nameField.getText()), true);
-					} catch (IntegrityException e) {
-						throw new IOException(e); //shouldn't ever occur unless the user's hard drive is failing?
-					}
-				} catch (MissingVersionException e) {
-					throw new AssertionError(e); //should be impossible
-				} catch(IOException | InterruptedException | ExecutionException e) {
-					throw new DatabaseError(e);
-				}
-			}
 			else {
-				throw new AssertionError(selectedVersion.name() + " was downloaded, but isn't vaulted?! Error in logic?");
+				installer.install();
 			}
 		}
-		catch(IOException e) {
+		catch(InstallException e) {
 			e.printStackTrace(); //TODO: popup
 		}
-		catch(DatabaseError e) {
-			e.printStackTrace(); //TODO: popup
+	}
+	
+	private void downloadFinish(Skin skin) {
+		MainApplication.INSTANCE.getMainWindow().setVisible(true);
+		if(downloadProblem != null) {
+			Dialog dialog = new Dialog(I18N.translate("popup.download.title.failed"), skin);
+			dialog.getContentTable().add(I18N.translate("popup.download.text.failed", downloadProblem.getMessage()));
+			downloadProblem.printStackTrace();
+			dialog.button(I18N.translate("ok"));
+			MainApplication.INSTANCE.addAndCenterWindow(dialog, false);
 		}
 	}
 	

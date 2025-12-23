@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.Base64.Decoder;
 import java.util.concurrent.TimeUnit;
 
+@CompileStrictly("1.8")
 public class JVMInstance extends JVMBinary implements JVM {
 
 	private final Properties properties;
@@ -54,7 +55,7 @@ public class JVMInstance extends JVMBinary implements JVM {
 		return current;
 	}
 	
-	public static JVMBinary fromPath(Path jvmLocation, Path launchDir) throws IOException {
+	public static JVMInstance fromPath(Path jvmLocation, Path launchDir) throws IOException {
 		
 		String currentClasspath = System.getProperty("java.class.path");
 		List<String> classpathEntries = new ArrayList<>();
@@ -139,9 +140,10 @@ public class JVMInstance extends JVMBinary implements JVM {
 			if(!process.waitFor(5, TimeUnit.SECONDS)) {
 				process.destroyForcibly();
 			}
-			int exitCode = process.waitFor();
+			
+			int exitCode = process.waitFor(); //ensure process is dead
 			if(exitCode != 0 || properties.isEmpty() || !finished) {
-				throw new IOException("Failed to read properties from JVM at " + jvmLocation + " (Exit code: " + exitCode + ")");
+				throw new IOException("Failed to read properties from JVM at " + jvmLocation + " (Exit code: " + exitCode + ", Properties: " + properties.size() + ")");
 			}
 			String version = properties.getProperty(JAVA_SPEC_VERSION_KEY);
 			if (version == null) {

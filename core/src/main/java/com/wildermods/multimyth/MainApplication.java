@@ -1,6 +1,8 @@
 package com.wildermods.multimyth;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.stream.Collectors;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -16,10 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.google.gson.FormattingStyle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wildermods.multimyth.internal.CompileStrictly;
+import com.wildermods.multimyth.internal.GsonHelper;
 import com.wildermods.multimyth.internal.Steam;
 import com.wildermods.multimyth.ui.MainWindow;
 import com.wildermods.multimyth.ui.NewInstanceWindow;
@@ -30,12 +32,20 @@ import com.wildermods.thrixlvault.wildermyth.WildermythManifest;
 public class MainApplication extends ApplicationAdapter {
 	
 	public static final String VERSION = "@MULTIMYTH_VERSION@";
+	public static final Path MULTIMYTH_DIR = Path.of(System.getProperty("user.home")).resolve("multimyth");
+	public static final Path SAVE_DIR = MULTIMYTH_DIR.resolve("instances");
+	static {
+		try {
+			Files.createDirectories(SAVE_DIR);
+		} catch (IOException e) {
+			throw new ExceptionInInitializerError(e);
+		}
+	}
 	
 	public static final Gson gson;
 	static {
-		GsonBuilder builder = new GsonBuilder();
-		builder.setFormattingStyle(FormattingStyle.PRETTY.withIndent("\t"));
-		gson = builder.create();
+		GsonBuilder b = GsonHelper.GSON_BUILDER; //gsonHelper must remain java 8 compatible
+		gson = b.create();
 	}
 	
 	private Steam steam = new Steam() {
@@ -159,6 +169,45 @@ public class MainApplication extends ApplicationAdapter {
 	
 	public Skin getSkin() {
 		return skin;
+	}
+	
+	public Stage getStage() {
+		return stage;
+	}
+	
+	public void addAndCenterWindow(Window window) {
+		this.getStage().addActor(window);
+		centerOnStage(window, getStage());
+	}
+	
+	public void addAndCenterWindow(Window window, boolean resize) {
+		this.getStage().addActor(window);
+		centerOnStage(window, -1, -1, getStage());
+	}
+	
+	private void centerOnStage(Window window, Stage stage) {
+	    window.pack(); // ensures width/height are computed
+	    float height = stage.getHeight() / 2;
+	    float width = stage.getWidth() / 4;
+	    centerOnStage(window, width, height, stage);
+	}
+	
+	private void centerOnStage(Window window, float width, float height, Stage stage) {
+	    window.pack(); // ensures width/height are computed
+
+	    if(width > 0f) {
+	    	window.setHeight(width);
+	    }
+	    if(height > 0f) {
+	    	window.setWidth(height);
+	    }
+	    
+	    float x = Math.round((stage.getWidth() - window.getWidth()) / 2f);
+	    float y = Math.round((stage.getHeight() - window.getHeight()) / 2f);
+	    
+	    window.setPosition(x, y);
+	    window.invalidateHierarchy();
+	    window.validate();
 	}
 	
 	public MainWindow getMainWindow() {

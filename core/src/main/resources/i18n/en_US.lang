@@ -24,7 +24,7 @@ topPanel.steam.loggedIn=Welcome, {0}
 
 sidePanel.launch=Launch
 sidePanel.edit=Edit Instance
-sidePanel.view.mods=View Mods
+sidePanel.viewMods=View Mods
 sidePanel.screenshots=View Screenshots
 sidePanel.installFolder=Install Folder
 sidePanel.configFolder=Config Folder
@@ -33,6 +33,12 @@ sidePanel.shortcut=Create Shortcut
 sidePanel.clone=Copy Instance
 
 bottomPanel.version=Multimyth version {0}
+
+instance.error=<error/corrupt>
+instance.popup.delete.title=Are you sure?
+instance.popup.delete.dialog=Are you sure you want to delete {0}?
+instance.popup.delete.success=Deletion Successful
+instance.popup.delete.success.dialog=Successfully deleted {0}
 
 instance.create.label.window=Name:
 instance.create.header.version=Version
@@ -77,7 +83,13 @@ instance.edit.window.logs.clean=Clean
 
 instance.edit.window.logs.clean.confirm=Are you sure you want to delete all log files?
 
+popup.downloading.title=Downloading {0} {1}
+popup.downloading.text=Download is in progress. This may take a while.
+popup.download.title.failed=Download failed
+popup.download.text.failed=Download failed: {0}
+
 error.ass=This machine is ass. Session Terminated.
 error.unexpected=Unexpected Error Occurred: {0}
+error.delete.fail=Failed to delete {0}
 error.steam.signedout=You have been signed out of Steam. Until you sign in again, you can only play versions that are already installed.
 error.steam.signin.fail=Failed to authenticate with Steam: {0}
